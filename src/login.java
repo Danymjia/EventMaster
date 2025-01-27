@@ -13,47 +13,64 @@ public class login {
     private JButton ingresarbtn;
     private JLabel usuariolbl;
     private JLabel passwordlbl;
-
+    private JComboBox<String> comboBoxLogin;
 
     public login() {
+
+        comboBoxLogin.addItem("Administrador");
+        comboBoxLogin.addItem("Usuario");
+
         ingresarbtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 String username = usuariotxt.getText();
                 String password = new String(passwordtxt.getPassword());
+                String rol = (String) comboBoxLogin.getSelectedItem();
 
-                if (autenticarLogin(username, password)) {
-                    JOptionPane.showMessageDialog(null, "Sesión Iniciada" , "Inicio de Sesióon", JOptionPane.INFORMATION_MESSAGE);
+                if (autenticarLogin(username, password, rol)) {
+                    JOptionPane.showMessageDialog(null, "Bienvenido " + rol, "Inicio de Sesión", JOptionPane.INFORMATION_MESSAGE);
 
-                    JFrame login = (JFrame) SwingUtilities.getWindowAncestor(mainPanel);
-                    if (login != null) {
-                        login.dispose();
+                    JFrame loginFrame = (JFrame) SwingUtilities.getWindowAncestor(mainPanel);
+                    if (loginFrame != null) {
+                        loginFrame.dispose();
                     }
 
-                    JFrame frame = new JFrame("Menú Principal");
+                    if ("Administrador".equals(rol)) {
 
-                    frame.setContentPane(new menu().menuPanel);
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    frame.setSize(700,500);
-                    frame.setPreferredSize(new Dimension(700,500));
-                    frame.pack();
-                    frame.setVisible(true);
+                        JFrame frame = new JFrame("Menú Principal");
+                        frame.setContentPane(new menu().menuPanel);
+                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        frame.setSize(700, 500);
+                        frame.setPreferredSize(new Dimension(700, 500));
+                        frame.pack();
+                        frame.setVisible(true);
+
+                    } else {
+
+                        JFrame frame = new JFrame("Usuario");
+                        frame.setContentPane(new registroEventos().registroEventosPanel);
+                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        frame.setSize(700, 500);
+                        frame.setPreferredSize(new Dimension(700, 500));
+                        frame.pack();
+                        frame.setVisible(true);
+
+                    }
 
                 } else {
-                    JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Usuario, contraseña o rol incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
     }
 
-    private boolean autenticarLogin(String username, String password) {
+    private boolean autenticarLogin(String username, String password, String rol) {
         try (Connection conn = conexionBD.getConnection()) {
-
-            String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ?";
+            String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ? AND rol = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, password);
+            stmt.setString(3, rol);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
 
@@ -63,4 +80,3 @@ public class login {
         }
     }
 }
-

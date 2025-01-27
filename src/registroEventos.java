@@ -7,19 +7,18 @@ import java.sql.*;
 
 public class registroEventos {
     private JTextField nombreeventotxt;
-    private JTextField fechaeventotext;
-    private JTextField ubicacioneventotext;
-    private JTable registrostable;
+    private JTextField fechaeventotxt;
+    private JTextField ubicacioneventotxt;
     private JTextField descripcioneventotxt;
     public JPanel registroEventosPanel;
     private JLabel nombreeventolbl;
     private JLabel fechaeventolbl;
     private JLabel ubicacioneventolbl;
     private JLabel descripcioneventolbl;
-    private JButton guardarButton;
     private JButton listarbtn;
     private JButton guardarbtn;
     private JButton regresarbtn;
+    private JLabel titulotxt;
 
     public registroEventos() {
 
@@ -28,16 +27,16 @@ public class registroEventos {
             public void actionPerformed(ActionEvent e) {
 
                 String nombre = nombreeventotxt.getText();
-                String fecha = fechaeventotext.getText();
-                String ubicacion = ubicacioneventotext.getText();
+                String fecha = fechaeventotxt.getText();
+                String ubicacion = ubicacioneventotxt.getText();
                 String descripcion = descripcioneventotxt.getText();
 
                 if (!nombre.isEmpty() && !fecha.isEmpty() && !ubicacion.isEmpty() && !descripcion.isEmpty()) {
-                    guardarBD(nombre, fecha, ubicacion, descripcion);
+                    guardarEvento(nombre, fecha, ubicacion, descripcion);
 
                     nombreeventotxt.setText("");
-                    fechaeventotext.setText("");
-                    ubicacioneventotext.setText("");
+                    fechaeventotxt.setText("");
+                    ubicacioneventotxt.setText("");
                     descripcioneventotxt.setText("");
 
                 } else {
@@ -45,7 +44,7 @@ public class registroEventos {
                 }
             }
 
-            private void guardarBD(String nombre, String fecha, String ubicacion, String descripcion) {
+            private void guardarEvento(String nombre, String fecha, String ubicacion, String descripcion) {
                 String query = "INSERT INTO eventos (nombre, fecha, ubicacion, descripcion) VALUES (?, ?, ?, ?)";
 
                 try (Connection conn = conexionBD.getConnection();
@@ -85,11 +84,14 @@ public class registroEventos {
                 JPanel bottomPanel = new JPanel();
                 bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
+                JButton regresarBtn = new JButton("Regresar");
+                bottomPanel.add(regresarBtn);
+
                 JButton eliminarBtn = new JButton("Eliminar Evento");
                 bottomPanel.add(eliminarBtn);
 
-                JButton regresarBtn = new JButton("Regresar");
-                bottomPanel.add(regresarBtn);
+                JButton actualizarBtn = new JButton("Actualizar Evento");
+                bottomPanel.add(actualizarBtn);
 
                 frame.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -99,6 +101,22 @@ public class registroEventos {
                 frame.setPreferredSize(new Dimension(700, 500));
                 frame.pack();
                 frame.setVisible(true);
+
+                regresarBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        JFrame newFrame = new JFrame("Gestión de Eventos");
+                        newFrame.setContentPane(new registroEventos().registroEventosPanel);
+                        newFrame.setSize(700, 500);
+                        newFrame.setPreferredSize(new Dimension(700, 500));
+                        newFrame.pack();
+                        newFrame.setVisible(true);
+
+                        JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor(regresarBtn);
+                        currentFrame.dispose();
+                    }
+                });
 
                 eliminarBtn.addActionListener(new ActionListener() {
                     @Override
@@ -112,16 +130,16 @@ public class registroEventos {
                     }
                 });
 
-                regresarBtn.addActionListener(new ActionListener() {
+                actualizarBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        frame.dispose();
-                        JFrame newFrame = new JFrame("Gestión de Eventos");
-                        newFrame.setContentPane(new registroEventos().registroEventosPanel);
-                        newFrame.setSize(700, 500);
-                        newFrame.setPreferredSize(new Dimension(700, 500));
-                        newFrame.pack();
-                        newFrame.setVisible(true);
+                        String idActualizar = JOptionPane.showInputDialog(frame, "Ingrese el ID del evento a Actualizar:");
+                        if (idActualizar != null && !idActualizar.isEmpty()) {
+                            int idEvento = Integer.parseInt(idActualizar);
+                            actualizarEvento(idEvento, eventosTable);
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Por favor ingrese un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 });
             }
@@ -172,7 +190,50 @@ public class registroEventos {
                     JOptionPane.showMessageDialog(null, "Error al eliminar el evento: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+
+            private void actualizarEvento(int id, JTable eventosTable) {
+                JTable frame =new JTable();
+                // Pedir los nuevos valores para el evento
+                String nuevoNombre = JOptionPane.showInputDialog(frame, "Ingrese el nuevo nombre del evento:");
+                String nuevaFecha = JOptionPane.showInputDialog(frame, "Ingrese la nueva fecha del evento (formato YYYY-MM-DD):");
+                String nuevaUbicacion = JOptionPane.showInputDialog(frame, "Ingrese la nueva ubicación del evento:");
+                String nuevaDescripcion = JOptionPane.showInputDialog(frame, "Ingrese la nueva descripción del evento:");
+
+                // Validar si los campos no están vacíos
+                if (nuevoNombre != null && !nuevoNombre.isEmpty() &&
+                        nuevaFecha != null && !nuevaFecha.isEmpty() &&
+                        nuevaUbicacion != null && !nuevaUbicacion.isEmpty() &&
+                        nuevaDescripcion != null && !nuevaDescripcion.isEmpty()) {
+
+                    String query = "UPDATE eventos SET nombre = ?, fecha = ?, ubicacion = ?, descripcion = ? WHERE id = ?";
+
+                    try (Connection conn = conexionBD.getConnection();
+                         PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+                        // Establecer los valores para la actualización
+                        pstmt.setString(1, nuevoNombre);
+                        pstmt.setString(2, nuevaFecha);
+                        pstmt.setString(3, nuevaUbicacion);
+                        pstmt.setString(4, nuevaDescripcion);
+                        pstmt.setInt(5, id); // El ID del evento que se actualizará
+
+                        int filasAfectadas = pstmt.executeUpdate();
+                        if (filasAfectadas > 0) {
+                            JOptionPane.showMessageDialog(null, "Evento actualizado correctamente.");
+                            cargarBD(eventosTable); // Recargar la tabla para mostrar el evento actualizado
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No se encontró un evento con este ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(null, "Error al actualizar el evento: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Por favor complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         });
+
         regresarbtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

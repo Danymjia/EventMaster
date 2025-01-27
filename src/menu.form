@@ -34,7 +34,7 @@
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
-      <component id="6b64" class="javax.swing.JButton" binding="irButton" default-binding="true">
+      <component id="6b64" class="javax.swing.JButton" binding="eventosbtn">
         <constraints>
           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -50,7 +50,7 @@
           <text value="Controlar Asistentes"/>
         </properties>
       </component>
-      <component id="24cb" class="javax.swing.JButton" binding="irButton1" default-binding="true">
+      <component id="24cb" class="javax.swing.JButton" binding="asistentesbtn">
         <constraints>
           <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -66,7 +66,7 @@
           <text value="Salir"/>
         </properties>
       </component>
-      <component id="96f8f" class="javax.swing.JButton" binding="irButton2" default-binding="true">
+      <component id="96f8f" class="javax.swing.JButton" binding="salirbtn">
         <constraints>
           <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
