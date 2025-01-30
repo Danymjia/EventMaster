@@ -193,13 +193,12 @@ public class registroEventos {
 
             private void actualizarEvento(int id, JTable eventosTable) {
                 JTable frame =new JTable();
-                // Pedir los nuevos valores para el evento
+
                 String nuevoNombre = JOptionPane.showInputDialog(frame, "Ingrese el nuevo nombre del evento:");
                 String nuevaFecha = JOptionPane.showInputDialog(frame, "Ingrese la nueva fecha del evento (formato YYYY-MM-DD):");
                 String nuevaUbicacion = JOptionPane.showInputDialog(frame, "Ingrese la nueva ubicación del evento:");
                 String nuevaDescripcion = JOptionPane.showInputDialog(frame, "Ingrese la nueva descripción del evento:");
 
-                // Validar si los campos no están vacíos
                 if (nuevoNombre != null && !nuevoNombre.isEmpty() &&
                         nuevaFecha != null && !nuevaFecha.isEmpty() &&
                         nuevaUbicacion != null && !nuevaUbicacion.isEmpty() &&
@@ -210,17 +209,16 @@ public class registroEventos {
                     try (Connection conn = conexionBD.getConnection();
                          PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-                        // Establecer los valores para la actualización
                         pstmt.setString(1, nuevoNombre);
                         pstmt.setString(2, nuevaFecha);
                         pstmt.setString(3, nuevaUbicacion);
                         pstmt.setString(4, nuevaDescripcion);
-                        pstmt.setInt(5, id); // El ID del evento que se actualizará
+                        pstmt.setInt(5, id);
 
                         int filasAfectadas = pstmt.executeUpdate();
                         if (filasAfectadas > 0) {
                             JOptionPane.showMessageDialog(null, "Evento actualizado correctamente.");
-                            cargarBD(eventosTable); // Recargar la tabla para mostrar el evento actualizado
+                            cargarBD(eventosTable);
                         } else {
                             JOptionPane.showMessageDialog(null, "No se encontró un evento con este ID.", "Error", JOptionPane.ERROR_MESSAGE);
                         }

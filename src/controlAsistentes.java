@@ -46,6 +46,11 @@ public class controlAsistentes {
                 } else {
                     JOptionPane.showMessageDialog(null, "Por favor complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+
+                if (telefono.length() != 10) {
+                    JOptionPane.showMessageDialog(null, "El número de teléfono debe tener 10 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
 
             private void guardarAsistentes(String nombre, String apellido, String email, String telefono, int eventoId, String tipoAsistente, String estadoAsistencia) {
@@ -138,8 +143,32 @@ public class controlAsistentes {
                         currentFrame.dispose();
                     }
                 });
-            }
 
+                eliminarBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String idEliminar = JOptionPane.showInputDialog(frame, "Ingrese el ID del Asistente a eliminar:");
+                        if (idEliminar != null && !idEliminar.isEmpty()) {
+                            eliminarAsistentes(Integer.parseInt(idEliminar), eventosTable);
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Por favor ingrese un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+
+                actualizarBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String idActualizar = JOptionPane.showInputDialog(frame, "Ingrese el ID del Asistente a Actualizar:");
+                        if (idActualizar != null && !idActualizar.isEmpty()) {
+                            int idEvento = Integer.parseInt(idActualizar);
+                            actualizarAsistentes(idEvento, eventosTable);
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Por favor ingrese un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+            }
 
             private void cargarAsistentes(JTable eventosTable) {
                 String[] columnNames = {"ID", "Nombre", "Apellido", "E-mail", "Telefono","Evento ID","Fecha", "Tipo Asistente", "Estado Asistencia"};
@@ -170,6 +199,72 @@ public class controlAsistentes {
                     JOptionPane.showMessageDialog(null, "Error al cargar los eventos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+
+
+            private void eliminarAsistentes(int id, JTable eventosTable) {
+                String query = "DELETE FROM asistentes WHERE id_asistente = ?";
+
+                try (Connection conn = conexionBD.getConnection();
+                     PreparedStatement pstmt = conn.prepareStatement(query)) {
+                    pstmt.setInt(1, id);
+
+                    int filasAfectadas = pstmt.executeUpdate();
+                    if (filasAfectadas > 0) {
+                        JOptionPane.showMessageDialog(null, "Asistente eliminado correctamente.");
+                        cargarAsistentes(eventosTable);
+
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se encontró un asistente con este ID", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, "Error al eliminar el asistente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            private void actualizarAsistentes(int id_asistente, JTable eventosTable) {
+                JTable frame =new JTable();
+
+                String nuevoNombre = JOptionPane.showInputDialog(frame, "Ingrese el nuevo nombre del asistente:");
+                String nuevoApellido = JOptionPane.showInputDialog(frame, "Ingrese el nuevo apellido del asistente:");
+                String nuevoTelefono = JOptionPane.showInputDialog(frame, "Ingrese el nuevo telefono del asistente:");
+                String nuevoEvento = JOptionPane.showInputDialog(frame, "Ingrese el ID del nuevo evento del asistente:");
+                String nuevoTipo = JOptionPane.showInputDialog(frame, "Ingrese el nuevo tipo del asistente:");
+                String nuevoEstado = JOptionPane.showInputDialog(frame, "Ingrese el nuevo estado del asistente:");
+
+                if (nuevoNombre != null && !nuevoNombre.isEmpty() &&
+                        nuevoApellido != null && !nuevoApellido.isEmpty() &&
+                        nuevoTelefono != null && !nuevoTelefono.isEmpty() &&
+                        nuevoEvento != null && !nuevoEvento.isEmpty() &&
+                        nuevoTipo != null && !nuevoTipo.isEmpty() &&
+                        nuevoEstado != null && !nuevoEstado.isEmpty()) {
+
+                    String query = "UPDATE asistentes SET nombre = ?, apellido = ?, email = ?, telefono = ?, evento_id = ?, tipo_asistente = ?, estado_asistencia = ? WHERE id_asistente = ?";
+                    try (Connection conn = conexionBD.getConnection();
+                         PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+                        pstmt.setString(1, nuevoNombre);
+                        pstmt.setString(2, nuevoApellido);
+                        pstmt.setString(3, nuevoTelefono);
+                        pstmt.setString(4, nuevoEvento);
+                        pstmt.setString(5, nuevoTipo);
+                        pstmt.setString(6, nuevoEstado);
+                        pstmt.setInt(7, id_asistente);
+
+                        int filasAfectadas = pstmt.executeUpdate();
+                        if (filasAfectadas > 0) {
+                            JOptionPane.showMessageDialog(null, "Asistente actualizado correctamente.");
+                            cargarAsistentes(eventosTable);
+                            JOptionPane.showMessageDialog(null, "No se encontró un asistente con este ID.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(null, "Error al actualizar el asistente: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Por favor complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         });
 
     }
@@ -192,10 +287,11 @@ public class controlAsistentes {
         }
     }
 
+
+
     private void cargarEstadosAsistencia() {
         estadoAsistenciaComboBox.addItem("Registrado");
-        estadoAsistenciaComboBox.addItem("Asistió");
-        estadoAsistenciaComboBox.addItem("No asistió");
+        estadoAsistenciaComboBox.addItem("Cancelado");
     }
 
     private void cargarTiposAsistencia() {
