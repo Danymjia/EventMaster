@@ -56,10 +56,10 @@ public class imprimir {
                         pdfTable.addCell(new PdfPCell(new Phrase("Descripción", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9))));
 
                         while (rs.next()) {
-                            pdfTable.addCell(rs.getString("nombre"));
-                            pdfTable.addCell(rs.getString("fecha"));
-                            pdfTable.addCell(rs.getString("ubicacion"));
-                            pdfTable.addCell(rs.getString("descripcion"));
+                            pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("nombre"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                            pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("fecha"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                            pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("ubicacion"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                            pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("descripcion"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
                         }
 
                         document.add(pdfTable);
@@ -69,10 +69,10 @@ public class imprimir {
 
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error al generar el PDF.");
+                        JOptionPane.showMessageDialog(null, "Error al generar el PDF.", "Error",JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Operación cancelada.");
+                    JOptionPane.showMessageDialog(null, "No se ha seleccionado una ruta.", "Error",JOptionPane.ERROR_MESSAGE);
                 }
 
             }
@@ -98,7 +98,7 @@ public class imprimir {
                         PdfWriter.getInstance(document, new FileOutputStream(fileToSave));
                         document.open();
 
-                        document.add(new Paragraph("Historial de Asistentes Registrados", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK)));
+                        document.add(new Paragraph("Historial de Asistentes Registrados", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13, BaseColor.BLACK)));
                         document.add(new Paragraph(" "));
 
                         String sql = "SELECT id_asistente, nombre, apellido, email, telefono, evento_id, fecha_registro, estado_asistencia, tipo_asistente FROM asistentes";
@@ -120,15 +120,17 @@ public class imprimir {
                         pdfTable.addCell(new PdfPCell(new Phrase("Tipo", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9))));
 
                         while (rs.next()) {
-                            pdfTable.addCell(rs.getString("id_asistente"));
-                            pdfTable.addCell(rs.getString("nombre"));
-                            pdfTable.addCell(rs.getString("apellido"));
-                            pdfTable.addCell(rs.getString("email"));
-                            pdfTable.addCell(rs.getString("telefono"));
-                            pdfTable.addCell(rs.getString("evento_id"));
-                            pdfTable.addCell(rs.getString("fecha_registro"));
-                            pdfTable.addCell(rs.getString("estado_asistencia"));
-                            pdfTable.addCell(rs.getString("tipo_asistente"));
+
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("id_asistente"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("nombre"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("apellido"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("email"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("telefono"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("evento_id"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("fecha_registro"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("estado_asistencia"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+                                pdfTable.addCell(new PdfPCell(new Phrase(rs.getString("tipo_asistente"), FontFactory.getFont(FontFactory.HELVETICA, 9))));
+
                         }
 
                         document.add(pdfTable);
@@ -138,10 +140,10 @@ public class imprimir {
 
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error al generar el PDF.");
+                        JOptionPane.showMessageDialog(null, "Error al generar el PDF.","Error",JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Operación cancelada.");
+                    JOptionPane.showMessageDialog(null, "No se ha seleccionado una ruta.", "Error",JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -156,9 +158,10 @@ public class imprimir {
                 JFrame frame = new JFrame("Menú Principal");
                 frame.setContentPane(new menu().menuPanel);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(700, 500);
-                frame.setPreferredSize(new Dimension(700, 500));
+                frame.setSize(600, 300);
+                frame.setPreferredSize(new Dimension(600, 300));
                 frame.pack();
+                frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
 
             }

@@ -20,8 +20,6 @@ public class login {
         comboBoxLogin.addItem("Administrador");
         comboBoxLogin.addItem("Usuario");
 
-
-
         ingresarbtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -38,22 +36,24 @@ public class login {
                     }
 
                     if ("Administrador".equals(rol)) {
-
                         JFrame frame = new JFrame("Menú Principal");
                         frame.setContentPane(new menu().menuPanel);
                         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                        frame.setSize(700, 500);
-                        frame.setPreferredSize(new Dimension(700, 500));
+                        frame.setSize(600, 300);
+                        frame.setPreferredSize(new Dimension(600, 300));
                         frame.pack();
+                        frame.setLocationRelativeTo(null);
                         frame.setVisible(true);
 
-                    } else {
-
-                        JFrame usuarioFrame = new JFrame("Usuario");
-                        String eventId = JOptionPane.showInputDialog(null, "Ingrese el ID del evento:", "Buscar Evento", JOptionPane.QUESTION_MESSAGE);
-                        if (eventId != null && !eventId.trim().isEmpty()) {
-                            mostrarDetallesEvento(eventId, usuarioFrame);
-                        }
+                    } else if ("Usuario".equals(rol)) {
+                        JFrame frame = new JFrame("Listado");
+                        frame.setContentPane(new usuario().mainUsuario);
+                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        frame.setSize(600, 300);
+                        frame.setPreferredSize(new Dimension(600, 300));
+                        frame.pack();
+                        frame.setLocationRelativeTo(null);
+                        frame.setVisible(true);
                     }
 
                 } else {
@@ -61,32 +61,6 @@ public class login {
                 }
             }
 
-            private void mostrarDetallesEvento(String eventId, JFrame frame) {
-                try (Connection conn = conexionBD.getConnection()) {
-                    String sql = "SELECT nombre, fecha, ubicacion, descripcion FROM eventos WHERE id = ?";
-                    PreparedStatement stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, eventId);
-                    ResultSet rs = stmt.executeQuery();
-
-                    if (rs.next()) {
-                        String nombre = rs.getString("nombre");
-                        String fecha = rs.getString("fecha");
-                        String ubicacion = rs.getString("ubicacion");
-                        String descripcion = rs.getString("descripcion");
-
-                        JTextArea textArea = new JTextArea(5, 30);
-                        textArea.setText("Nombre: " + nombre + "\nFecha: " + fecha + "\nUbicación: " + ubicacion + "\nDescripción: " + descripcion);
-                        textArea.setEditable(false);
-
-                        JOptionPane.showMessageDialog(frame, new JScrollPane(textArea), "Detalles del Evento", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(frame, "No se encontró el evento con ID: " + eventId, "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, "Error al recuperar los datos del evento", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
         });
     }
 
